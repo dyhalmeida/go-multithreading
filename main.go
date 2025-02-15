@@ -2,52 +2,49 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
-func Task(name string) {
-	for i := 1; i < 11; i++ {
-		fmt.Printf("%d - Task %s is running\n", i, name)
+func Task(name string, wg *sync.WaitGroup) {
+	for i := 0; i < 10; i++ {
+		fmt.Printf("%d - Task %s is running\n", i+1, name)
 		time.Sleep(1 * time.Second)
+		wg.Done()
 	}
 }
 
-func SerialProcessing() {
-	Task("A")
-	Task("B")
-}
+// Wait Proups Parts
 
-// SimultaneousProcessing is thread 1
+// add number of operations
+// report that an operation has finished
+// wait until all operations have finished
+
 func SimultaneousProcessing() {
 
-	// Task C is thread 2
-	go Task("C")
+	waitGroup := sync.WaitGroup{}
+	waitGroup.Add(25)
 
-	// Task D is thread 3
-	go Task("D")
+	// Task A is thread 2
+	go Task("A", &waitGroup)
 
-	// Task anonymous E is thread 4
-	go func(name string) {
-		for i := 1; i < 11; i++ {
-			fmt.Printf("%d - Task anonymous %s is running\n", i, name)
+	// Task B is thread 3
+	go Task("B", &waitGroup)
+
+	// Task anonymous C is thread 4
+	go func(name string, wg *sync.WaitGroup) {
+		for i := 0; i < 5; i++ {
+			fmt.Printf("%d - Task anonymous %s is running\n", i+1, name)
 			time.Sleep(1 * time.Second)
+			wg.Done()
 		}
-	}("E")
+	}("C", &waitGroup)
 
-	// temporary solution to arrest Simultaneous Processing
-	time.Sleep(10 * time.Second)
+	waitGroup.Wait()
 }
 
+// main is thread 1
 func main() {
-	fmt.Println("SerialProcessing start")
-	fmt.Println("")
-
-	SerialProcessing()
-
-	fmt.Println("")
-	fmt.Println("SerialProcessing finish")
-
-	fmt.Println("")
 	fmt.Println("SimultaneousProcessing start")
 	fmt.Println("")
 
