@@ -1,5 +1,4 @@
 /*
-*
 Esse código apresenta um problema de concorrência quando múltiplas requisições HTTP são feitas simultaneamente.
 
 O Problema de Concorrência
@@ -17,7 +16,14 @@ Duas requisições chegam quase ao mesmo tempo.
 Ambas as goroutines leem o valor atual de count (suponha que seja 10).
 Ambas calculam count + 1 e atribuem o novo valor (11).
 O valor de count deveria ser 12, mas como ambas escreveram 11, perdemos um incremento.
-*
+
+Para o teste foi utilizado o comando do apache benchmark (ab):
+
+ab -n 10000 -c 100 http://localhost:8080/
+
+-n 10000 -> Número total de requisições que serão enviadas (10.000 requisições).
+-c 100 -> Número de conexões concorrentes, ou seja, quantas requisições serão feitas ao mesmo tempo (100 requisições simultâneas).
+http://localhost:8080/ -> URL do servidor que será testado (localhost na porta 8080)
 */
 package main
 
