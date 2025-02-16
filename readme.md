@@ -1,8 +1,10 @@
 # Go Multithreading
 
-## Topics studied
+## Tópicos Estudados
 
 - [Go routines](https://github.com/dyhalmeida/go-multithreading/blob/main/main.go)
-    - Serial processing and simultaneous Processing
+    - Processamento serial e processamento simultâneo
 - [Wait Groups](https://github.com/dyhalmeida/go-multithreading/tree/wait-groups/main.go)
-    - A WaitGroup waits for a collection of goroutines to finish
+    - Um WaitGroup aguarda que uma coleção de goroutines termine
+- [Simple Concurrency Problema](https://github.com/dyhalmeida/go-multithreading/blob/simple-concurrency-problem/main.go)
+    - Um problema simples de simultaneidade usando o servidor http
