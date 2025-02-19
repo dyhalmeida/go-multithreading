@@ -18,3 +18,5 @@
     - Utilizando channels e causando problema de deadlock
 - [Range com channels](https://github.com/dyhalmeida/go-multithreading/blob/channel-with-range/main.go)
     - Utilizando range para consumir dados de um canal
+- [Channels directions](https://github.com/dyhalmeida/go-multithreading/blob/channel-directions/main.go)
+    - Utilizando direcionadores de canais para especificar a direção do fluxo de dados.
