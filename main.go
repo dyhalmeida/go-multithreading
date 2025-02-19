@@ -1,39 +1,56 @@
 /*
 # O que é o problema de concorrência nesse caso?
-No código original sem sincronização, múltiplas goroutines podiam acessar e modificar count ao mesmo tempo,
-causando uma condição de corrida (race condition) e valores inconsistentes.
+No código original, várias goroutines podem acessar e modificar count ao mesmo tempo,
+causando uma condição de corrida. Isso resulta em valores inconsistentes.
 
 # Como o código resolve isso?
-A solução aqui é utilizar atomic.AddInt64(&count, 1), que incrementa count de forma atômica.
+O código resolve o problema de concorrência utilizando um channel para sincronizar o acesso ao contador count.
 
-- atomic.AddInt64() faz a soma de 1 ao valor de count, garantindo que a operação seja segura entre múltiplas goroutines.
-- Diferente do sync.Mutex, não há bloqueios — as goroutines podem executar incrementos sem esperar.
+- A goroutine anônima escuta o canal countChannel em loop infinito, ou seja fica aguardando o canal countChannel
+receber um valor e ser esvaziado, atribuindo o valor para increment.
 
-# Observação
-- sync/atomic é uma solução mais leve e eficiente para contadores e números.
-- sync.Mutex é útil quando há múltiplas variáveis ou blocos mais complexos.
+- Quando uma requisição chega, o handler envia uma mensagem (incremento) para o canal countChannel.
+(countChannel <- 1  // Envia um incremento para o canal), Isso faz com que a goroutine que escuta o canal
+receba a mensagem e execute a operação de incrementar count.
 
-# Para o teste foi utilizado o comando do apache benchmark (ab):
+# Como o channel resolve o problema de concorrência?
+O canal age como um sinalizador de sincronização entre a goroutine do servidor HTTP e a goroutine que atualiza o contador count.
 
-ab -n 10000 -c 100 http://localhost:8080/
+## Comunicação entre goroutines:
+O canal countChannel garante que apenas uma goroutine possa atualizar o contador count por vez.
+Sempre que uma requisição chega, ela envia um valor para o canal. O canal armazena e organiza essas mensagens.
 
--n 10000 -> Número total de requisições que serão enviadas (10.000 requisições).
--c 100 -> Número de conexões concorrentes, ou seja, quantas requisições serão feitas ao mesmo tempo (100 requisições simultâneas).
-http://localhost:8080/ -> URL do servidor que será testado (localhost na porta 8080)
+## Garantia de atualização sequencial:
+Como as mensagens enviadas para o canal são processadas uma de cada vez pela goroutine que escuta o canal,
+o contador count nunca será atualizado simultaneamente por múltiplas goroutines.
+Isso evita condições de corrida e garante que o valor de count seja atualizado de forma sequencial e consistente.
+
+## Sincronização sem bloqueio explícito:
+Diferente de usar um mutex (onde você precisaria bloquear e desbloquear o acesso à variável), o canal resolve a concorrência
+de maneira implícita e sem a necessidade de locks. Ele faz isso ordenando as mensagens e permitindo que apenas uma goroutine
+acesse o valor de count de cada vez.
 */
 package main
 
 import (
 	"fmt"
 	"net/http"
-	"sync/atomic"
 )
 
 var count int64 = 0
+var countChannel = make(chan int64)
 
 func main() {
+
+	go func() {
+		for {
+			increment := <-countChannel // Esvazia o canal, atribui o valor para increment
+			count += increment
+		}
+	}()
+
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-		atomic.AddInt64(&count, 1)
+		countChannel <- 1 // Enche o canal, publica 1 no canal
 		res.WriteHeader(http.StatusOK)
 		res.Write([]byte(fmt.Sprintf("Você é o visitante número: %d", count)))
 
