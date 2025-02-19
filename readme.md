@@ -14,3 +14,5 @@
     - Utilizando sync.atomic para resolver o problema simples de concorrência
 - [Problema simples de concorrência solucionado com Channels](https://github.com/dyhalmeida/go-multithreading/blob/concurrency-problem-with-channels-solution/main.go)
     - Utilizando Channels para resolver o problema simples de concorrência
+- [Problema de deadlock com channels](https://github.com/dyhalmeida/go-multithreading/blob/forever-deadlock/main.go)
+    - Utilizando channels e causando problema de deadlock
