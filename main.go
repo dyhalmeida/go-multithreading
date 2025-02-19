@@ -1,58 +1,37 @@
+/*
+# O que são os direcionadores de canais?
+Em Go, os direcionadores de canais são usados para especificar a direção do fluxo de dados.
+Ou seja, você pode definir se um canal pode ser usado para enviar dados, para receber dados, ou para ambos.
+Essa direção pode ser explicitada na assinatura da função ou do tipo do canal.
+
+chan<- T: canal somente para envio (somente escrever no canal).
+<-chan T: canal somente para recebimento (somente ler do canal).
+Esses direcionadores ajudam a garantir a segurança do programa e a evitar erros de concorrência,
+pois asseguram que o canal será usado de forma apropriada, sem permitir que dados sejam enviados ou recebidos de maneira errada.
+
+# chan<- string:
+O direcionador chan<- na assinatura da função pushToChannel indica que o canal pode apenas ser usado para envio de dados.
+Ou seja, essa função só pode enviar (escrever) dados para o canal, não pode ler do canal.
+
+# <-chan string
+O direcionador <-chan na assinatura da função pullFromChannel indica que o canal pode apenas ser usado para recebimento de dados.
+Ou seja, essa função só pode ler (receber) dados do canal, não pode enviar dados para o canal.
+
+Usar direcionadores de canais ajuda a organizar o fluxo de dados, evitar erros de concorrência e tornar o código mais seguro e legível.
+*/
+
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
-func Task(name string) {
-	for i := 1; i < 11; i++ {
-		fmt.Printf("%d - Task %s is running\n", i, name)
-		time.Sleep(1 * time.Second)
-	}
-}
-
-func SerialProcessing() {
-	Task("A")
-	Task("B")
-}
-
-// SimultaneousProcessing is thread 1
-func SimultaneousProcessing() {
-
-	// Task C is thread 2
-	go Task("C")
-
-	// Task D is thread 3
-	go Task("D")
-
-	// Task anonymous E is thread 4
-	go func(name string) {
-		for i := 1; i < 11; i++ {
-			fmt.Printf("%d - Task anonymous %s is running\n", i, name)
-			time.Sleep(1 * time.Second)
-		}
-	}("E")
-
-	// temporary solution to arrest Simultaneous Processing
-	time.Sleep(10 * time.Second)
-}
-
 func main() {
-	fmt.Println("SerialProcessing start")
-	fmt.Println("")
+	channel := make(chan string)
+	go pushToChannel("Hello World", channel)
+	pullFromChannel(channel)
+}
 
-	SerialProcessing()
+func pushToChannel(msg string, channel chan<- string) {
+	channel <- msg
+}
 
-	fmt.Println("")
-	fmt.Println("SerialProcessing finish")
-
-	fmt.Println("")
-	fmt.Println("SimultaneousProcessing start")
-	fmt.Println("")
-
-	SimultaneousProcessing()
-
-	fmt.Println("")
-	fmt.Println("SimultaneousProcessing finish")
+func pullFromChannel(channel <-chan string) {
+	println(<-channel)
 }
