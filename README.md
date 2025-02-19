@@ -10,3 +10,7 @@
     - Um problema simples de concorrência usando o servidor http
 - [Problema simples de concorrência solucionado com Mutex](https://github.com/dyhalmeida/go-multithreading/blob/concurrency-problem-with-mutex-solution/main.go)
     - Utilizando Mutex para resolver o problema simples de concorrência
+- [Problema simples de concorrência solucionado com atomic](https://github.com/dyhalmeida/go-multithreading/blob/concurrency-problem-with-atomic-solution/main.go)
+    - Utilizando sync.atomic para resolver o problema simples de concorrência
+- [Problema simples de concorrência solucionado com Channels](https://github.com/dyhalmeida/go-multithreading/blob/concurrency-problem-with-channels-solution/main.go)
+    - Utilizando Channels para resolver o problema simples de concorrência
