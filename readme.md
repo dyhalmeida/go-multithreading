@@ -20,3 +20,5 @@
     - Utilizando range para consumir dados de um canal
 - [Channels directions](https://github.com/dyhalmeida/go-multithreading/blob/channel-directions/main.go)
     - Utilizando direcionadores de canais para especificar a direção do fluxo de dados.
+- [Simple load balancer](https://github.com/dyhalmeida/go-multithreading/blob/simple-load-balancer/main.go)
+    - Utilizando goroutines e channels para simular um load balancer simples
