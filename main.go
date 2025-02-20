@@ -1,3 +1,30 @@
+/*
+# O que esse código faz?
+
+Esse código cria 10.000 workers (goroutines) que escutam um canal de comunicação (channel), onde recebem valores e os processam.
+O main() envia 100.000 números inteiros para o canal, e os workers os processam um por um.
+
+# Multithreading: Como o código usa várias threads?
+
+Go não trabalha diretamente com threads do sistema operacional (SO), mas sim com goroutines, que são muito mais leves do que threads tradicionais.
+Aqui, qtdWorkers := 10000 cria 10.000 goroutines, cada uma executando a função worker().
+Isso significa que 10.000 tarefas podem ser executadas simultaneamente, aproveitando múltiplos núcleos da CPU.
+Cada worker entra em um loop for x := range data, onde aguarda valores do canal e os processa quando chegam.
+
+# Comunicação entre threads: Como o canal (channel) funciona?
+
+O canal (channel) é o meio pelo qual os valores são distribuídos para os workers.
+make(chan int) cria um canal de inteiros sem buffer, o que significa que um valor enviado para o canal precisa ser recebido por alguma goroutine
+antes que outro valor possa ser enviado (se não, ele bloqueia).
+
+O main() envia números inteiros para o canal:
+for i := 0; i <= 100000; i++ {
+    channel <- i
+}
+
+Como os workers estão escutando esse canal, cada número é recebido por um único worker e processado.
+*/
+
 package main
 
 import (
@@ -5,54 +32,25 @@ import (
 	"time"
 )
 
-func Task(name string) {
-	for i := 1; i < 11; i++ {
-		fmt.Printf("%d - Task %s is running\n", i, name)
-		time.Sleep(1 * time.Second)
+func worker(workerId int, data chan int) {
+	for x := range data {
+		fmt.Printf("Worker %d received %d\n", workerId, x)
+		time.Sleep(time.Second)
 	}
 }
 
-func SerialProcessing() {
-	Task("A")
-	Task("B")
-}
-
-// SimultaneousProcessing is thread 1
-func SimultaneousProcessing() {
-
-	// Task C is thread 2
-	go Task("C")
-
-	// Task D is thread 3
-	go Task("D")
-
-	// Task anonymous E is thread 4
-	go func(name string) {
-		for i := 1; i < 11; i++ {
-			fmt.Printf("%d - Task anonymous %s is running\n", i, name)
-			time.Sleep(1 * time.Second)
-		}
-	}("E")
-
-	// temporary solution to arrest Simultaneous Processing
-	time.Sleep(10 * time.Second)
-}
-
 func main() {
-	fmt.Println("SerialProcessing start")
-	fmt.Println("")
 
-	SerialProcessing()
+	channel := make(chan int)
+	qtdWorkers := 10000
 
-	fmt.Println("")
-	fmt.Println("SerialProcessing finish")
+	for i := 0; i < qtdWorkers; i++ {
+		go worker(i, channel)
+	}
 
-	fmt.Println("")
-	fmt.Println("SimultaneousProcessing start")
-	fmt.Println("")
+	for i := 0; i < 100000; i++ {
+		channel <- i
+	}
+	close(channel)
 
-	SimultaneousProcessing()
-
-	fmt.Println("")
-	fmt.Println("SimultaneousProcessing finish")
 }
