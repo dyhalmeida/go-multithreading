@@ -24,3 +24,5 @@
     - Utilizando goroutines e channels para simular um load balancer simples
 - [Channel e Select](https://github.com/dyhalmeida/go-multithreading/blob/channel-and-select/main.go)
     - Utilizando channel e select para simular recepção de mensagens de dois sistemas diferentes
+- [Desafio multithreading](https://github.com/dyhalmeida/go-multithreading-challenge)
+    - Realizamos consultas simultâneas a duas APIs de CEP e utilizamos a resposta que chegar primeiro utilizando goroutines, channels e select
